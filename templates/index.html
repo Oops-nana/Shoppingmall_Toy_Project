@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        road_order();
+        road_rate();
+      });
+
+      function road_rate() {
+        $("#order-list").empty();
+        $.ajax({
+          url: "http://spartacodingclub.shop/sparta_api/rate",
+          type: "GET",
+          data: {},
+          success: function (success) {
+            let rate = success["rate"];
+            let html = `환율 : ${rate}`;
+            $("#exchange-rate").append(html);
+          },
+        });
+      }
+
+      function road_order() {
+        $.ajax({
+          type: "GET",
+          url: "/shop",
+          data: {},
+          success: function (response) {
+            let datas = response["data"];
+            for (let i = 0; i < datas.length; i++) {
+              let number = i;
+              let client = datas[i]["client"];
+              let amount = datas[i]["amount"];
+              let address = datas[i]["address"];
+              let phone = datas[i]["phone"];
+
+              let temp_html = `
+                                <tr>
+                                  <th scope="row">${number}</th>
+                                  <td>${client}</td>
+                                  <td>${amount}</td>
+                                  <td>${address}</td>
+                                  <td>${phone}</td>
+                                </tr>
+                              `;
+              $("#order-list").append(temp_html);
+            }
+          },
+        });
+      }
+
+      function order() {
+        let client_name = $("#client").val();
+        let amount = $("#amount").val();
+        let address = $("#address").val();
+        let phone = $("#phone").val();
+
+        $.ajax({
+          type: "POST",
+          url: "/shop",
+          data: {
+            client: client_name,
+            amount: amount,
+            address: address,
+            phone_num: phone,
+          },
+          success: function (response) {
+            if (response["valid"] == false)
+              alert("유효하지 않은 번호 형식입니다. ex) 010-0000-0000");
+            else {
+              window.location.reload();
+              alert(response["msg"]);
+            }
+          },
+        });
+      }
+    </script>
+
+    <title>스파르타코딩클럽 | 부트스트랩 연습하기</title>
+    <style>
+      .wraper {
+        margin: auto;
+        width: 500px;
+      }
+      .item_img {
+        width: 300px;
+        height: 300px;
+        background-position: center;
+        margin-top: 30px;
+        margin-left: auto;
+        margin-right: auto;
+        background-size: cover;
+        background-image: url("https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTh13hyVcVsc6BI0YSbWPTY4ZWhTpN7rernFRPbxc1Z6QO2KKGdLkxaoS951t9rU49ivNDwVqeP_-Y&usqp=CAc");
+        border-radius: 10px;
+      }
+      .item_title {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .item_content {
+        margin: auto;
+        display: inline;
+      }
+      .order_form {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .item_order {
+        width: 500px;
+        margin: auto;
+      }
+      .btn_order {
+        width: 100px;
+        display: block;
+        margin: auto;
+      }
+      #exchange-rate {
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wraper">
+      <div class="item_img"></div>
+      <div class="item_title">
+        <h3 class="item_content">양초를 팝니다.</h3>
+        <span class="item_content">가격 3,000원/개</span>
+      </div>
+      <div class="item_order">
+        <form action="">
+          <div id="exchange-rate"></div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">주문자 이름</span>
+            </div>
+            <input
+              id="client"
+              type="text"
+              class="form-control"
+              aria-describedby="inputGroup-sizing-default"
+              aria-label="default"
+            />
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">수량</span>
+            </div>
+            <select class="custom-select" name="" id="amount">
+              <option selected>수량을 선택하세요</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">주소</span>
+            </div>
+            <input
+              type="text"
+              id="address"
+              class="form-control"
+              aria-describedby="inputGroup-sizing-default"
+              aria-label="default"
+            />
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">전화번호</span>
+            </div>
+            <input
+              type="text"
+              id="phone"
+              class="form-control"
+              aria-describedby="inputGroup-sizing-default"
+              aria-label="default"
+            />
+          </div>
+        </form>
+      </div>
+      <a onclick="order()" class="btn btn-primary btn_order" role="button"
+        >주문하기
+      </a>
+      <div>
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">number</th>
+              <th scope="col">name</th>
+              <th scope="col">amount</th>
+              <th scope="col">address</th>
+              <th scope="col">phone</th>
+            </tr>
+          </thead>
+          <tbody id="order-list">
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>the Bird</td>
+              <td>@twitter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
